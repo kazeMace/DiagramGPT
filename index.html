@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>DiagramGPT</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/css/bootstrap.min.css"
+        integrity="sha384-xOolHFLEh07PJGoPkLv1IbcEPTNtaed2xpHsD9ESMhqIYd0nLMwNLD69Npy4HI+N" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.5.1/dist/jquery.slim.min.js"
+        integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"
+        integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.6.2/dist/js/bootstrap.min.js"
+        integrity="sha384-+sLIOodYLS7CIrQpBjl+C7nPvqq+FbNUBDunl/OZv93DB7Ln/533i8e/mZXLi/P+"
+        crossorigin="anonymous"></script>
+    <style>
+
+    </style>
+</head>
+
+<body>
+
+    <div class="header" style="width: 100%; height: 100px; background-color: black; color: beige;">
+        <div style="padding-left: 20px;">
+            <h1 style="  height: 100px; line-height: 100px;">DiagramGPT</h1>
+        </div>
+    </div>
+    <div class="middle-panel" style="width: 100%; display: grid; grid-template-columns: 50% 50%; height: 600px; padding-left: 30px; padding-top: 20px;">
+        <div class="left" style="height: 100%;">
+            <!-- <label for="type">选择类型：</label>
+            <select id="type">
+                <option value="流程图">流程图</option>
+                <option value="时序图">时序图</option>
+            </select> -->
+
+            <label for="type">选择图表类型：</label>
+            <select class="form-control" id="type" style="width: 30%">
+                <option value="流程图">流程图</option>
+                <option value="时序图">时序图</option>
+
+            </select>
+            <br>
+            <label for="query">自然语言描述：</label>
+            <textarea class="form-control" id="query" rows="3"></textarea>
+            <!-- <input type="text" id="query"> -->
+            <br>
+            <!-- <button type="button" id="render">生成</button> -->
+            <button type="button" class="btn btn-primary" id="render">生成</button>
+            <br>
+        </div>
+        <div class="right" style=" height: 100%;">
+            <div class="mermaid" id="diagram">
+            </div>
+        </div>
+
+    </div>
+
+
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: false });
+        var renderBtn = document.getElementById("render");
+        renderBtn.onclick = function () {
+            const type = document.getElementById("type").value;
+            const query = document.getElementById("query").value;
+            const data = { "type": type, "query": query };
+
+            const diagram = document.getElementById("diagram");
+            const output = document.getElementById("output");
+
+
+            fetch('/', {
+                method: 'POST',
+                body: JSON.stringify(data),
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.text())
+                .then(async data => {
+                    const res = data;
+                    console.log("res:");
+                    console.log(res);
+                    const drawDiagram = async function () {
+                        const { svg } = await mermaid.render('test', res);
+                        console.log("output: ");
+                        console.log(output);
+                        diagram.innerHTML = svg;
+                    };
+                    await drawDiagram();
+
+                })
+                .catch(error => console.error(error));
+        }
+    </script>
+</body>
+
+</html>
